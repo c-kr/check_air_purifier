@@ -126,7 +126,7 @@ class AirClient(air.AirClient):
         if 'err' in status:
             err = status['err']
             if err != 0:
-                err_str = {49408: 'no water', 32768: 'water tank open'}
+                err_str = {49408: 'no water', 32768: 'water tank open', 193: 'check filters'}
                 err = err_str.get(err, err)
                 values['Error'] = err
                 #print('-'*20)
@@ -163,15 +163,14 @@ if __name__ == '__main__':
         wifi = c.get_wifi()
         firmware = c.get_firmware()
 
-        #message += 'Power: {}\n'.format(status['Power'])
-
         for item,value in status.items():
+            if item == 'Error': # and value != 0
+                message += '{} is {} - '.format(item,value)
+                RC.append(2)
             if item in ['Button Light','Child lock','Fan Speed','Light brightness','Mode','Used Index','Power','Humidity','Target humidity','Temperature','Function','Water level']:
                 message += '{} is {} - '.format(item,value)
-
             if item in ['Fan Speed','Light brightness','Humidity','Target humidity','Temperature','Water level']:
                 perfdata += "'{}'={} ".format(item,value)
-
         for item,value in firmware.items():
             message += '{} is {} - '.format(item,value)
         for item,value in wifi.items():
